@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MineHub.Application\MineHub.Application.csproj" />
+    <ProjectReference Include="..\MineHub.Domain\MineHub.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
