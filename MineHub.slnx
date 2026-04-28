@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MineHub.Api/MineHub.Api.csproj" />
+    <Project Path="src/MineHub.Application/MineHub.Application.csproj" />
+    <Project Path="src/MineHub.Domain/MineHub.Domain.csproj" />
+    <Project Path="src/MineHub.Infrastructure/MineHub.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MineHub.Application.Tests/MineHub.Application.Tests.csproj" />
+    <Project Path="tests/MineHub.Domain.Tests/MineHub.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
