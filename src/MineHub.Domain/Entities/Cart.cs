@@ -42,7 +42,8 @@ public class Cart
             
             var updatedItem = new CartItem(
                 product.ProductId, 
-                product.Name, 
+                product.Name,
+                product.Description,
                 product.Price, 
                 existingItem.Quantity + quantity);
 
@@ -51,7 +52,7 @@ public class Cart
             return;
         }
 
-        _cartItems.Add(new CartItem(product.ProductId, product.Name, product.Price, quantity));
+        _cartItems.Add(new CartItem(product.ProductId, product.Name, product.Description, product.Price, quantity));
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
@@ -110,9 +111,9 @@ public class Cart
             
             var cartItem = _cartItems[index];
             
-            if (cartItem.ProductName != product.Name || cartItem.UnitPrice != product.Price)
+            if (cartItem.ProductName != product.Name || cartItem.UnitPrice != product.Price || cartItem.Description != product.Description)
             {
-                var updatedCartItem = new CartItem(cartItem.ProductId, product.Name, product.Price, cartItem.Quantity);
+                var updatedCartItem = new CartItem(cartItem.ProductId, product.Name, product.Description, product.Price, cartItem.Quantity);
 
                 _cartItems[index] = updatedCartItem;
 
