@@ -2,4 +2,4 @@
 
 namespace MineHub.Application.Products.Queries.GetProducts;
 
-public record GetProductsResponse(Guid ProductId, string Name, string Description, decimal Price);
+public record GetProductResponse(Guid ProductId, string Name, string Description, decimal Price);
