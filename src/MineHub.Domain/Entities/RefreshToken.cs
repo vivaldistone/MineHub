@@ -5,7 +5,7 @@ namespace MineHub.Domain.Entities;
 public sealed class RefreshToken
 {
     public Guid Id { get; private set; }
-    public Guid UserId { get; private set; }
+    public string UserId { get; private set; } = String.Empty;
     public string HashToken { get; private set; } = String.Empty;
     public DateTime CreatedAtUtc { get; private set; }
     public DateTime ExpiredAtUtc { get; private set; }
@@ -16,9 +16,9 @@ public sealed class RefreshToken
 
     private RefreshToken() { }
 
-    public RefreshToken(Guid userId, string tokenHash, DateTime expiredAtUtc)
+    public RefreshToken(string userId, string tokenHash, DateTime expiredAtUtc)
     {
-        if (userId == Guid.Empty)
+        if (String.IsNullOrWhiteSpace(userId))
             throw new DomainException("User Id is required", "invalid_user_id");
         if (string.IsNullOrWhiteSpace(tokenHash))
             throw new DomainException("Token hash is required", "invalid_refresh_token");
