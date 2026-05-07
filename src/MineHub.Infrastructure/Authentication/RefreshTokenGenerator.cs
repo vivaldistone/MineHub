@@ -3,7 +3,7 @@ using MineHub.Application.Abstractions.Services;
 
 namespace MineHub.Infrastructure.Authentication;
 
-public class CryptographicStringGenerator : ICryptographicStringGenerator
+public class RefreshTokenGenerator : IRefreshTokenGenerator
 {
     public string Generate(int sizeInBytes = 64)
     {
