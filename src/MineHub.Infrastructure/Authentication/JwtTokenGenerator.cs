@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MineHub.Infrastructure.Authentication
 {
-    internal class JwtTokenGenerator : IJwtTokenGenerator
+    public class JwtTokenGenerator : IJwtTokenGenerator
     {
         private readonly IConfiguration _configuration;
 
