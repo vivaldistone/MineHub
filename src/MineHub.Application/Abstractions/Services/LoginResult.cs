@@ -2,6 +2,6 @@
 
 public record LoginResult(
     bool Success,
-    string? UserId,
-    string? JwtToken,
-    string? RefreshToken);
+    string UserId,
+    string JwtToken,
+    string RefreshToken);
