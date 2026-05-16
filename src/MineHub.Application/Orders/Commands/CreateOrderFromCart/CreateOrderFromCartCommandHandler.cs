@@ -22,6 +22,13 @@ public class CreateOrderFromCartCommandHandler
     {
         var user = await _currentDomainUserService.GetRequiredAsync();
 
+        var createOrder = await _orderRepository.GetCreatedByUserIdAsync(user.Id);
+
+        if (createOrder is not null)
+        {
+            throw new ConflictException("Order already exists", "order_already_exists");
+        }
+
         var cart = await _cartRepository.GetByUserIdAsync(user.Id)
             ?? throw new NotFoundException("Cart not found", "cart_not_found");
 
