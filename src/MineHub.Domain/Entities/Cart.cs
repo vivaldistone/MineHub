@@ -84,8 +84,14 @@ public class Cart
         if (productId == Guid.Empty)
             throw new DomainException("Product Id is required", "invalid_product_id");
         
-        if (quantity <= 0)
-            throw new DomainException("Quantity must be greater than zero", "invalid_quantity");
+        if (quantity < 0)
+            throw new DomainException("Quantity cannot be negative", "invalid_quantity");
+
+        if (quantity == 0)
+        {
+            RemoveItem(productId);
+            return;
+        }
 
         var index = _cartItems.FindIndex(c => c.ProductId == productId);
         
