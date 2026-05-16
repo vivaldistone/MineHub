@@ -7,6 +7,7 @@ public interface IOrderRepository
     Task<Order?> GetByIdAsync(Guid id);
     Task<IReadOnlyCollection<Order>> GetAllAsync();
     Task<IReadOnlyCollection<Order>> GetByUserIdAsync(Guid userId);
+    Task<Order?> GetCreatedByUserIdAsync(Guid userId);
     Task AddAsync(Order order);
     Task UpdateAsync(Order order);
 }
