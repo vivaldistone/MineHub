@@ -7,14 +7,14 @@ namespace MineHub.Infrastructure.Identity.Services;
 
 public class IdentityService : IIdentityService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<AuthUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IJwtTokenGenerator _jwtGenerator;
     private readonly IRefreshTokenGenerator _refreshTokenGenerator;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IRefreshTokenHasher _refreshTokenHasher;
 
-    public IdentityService(UserManager<ApplicationUser> userManager, 
+    public IdentityService(UserManager<AuthUser> userManager, 
         RoleManager<IdentityRole> roleManager, 
         IJwtTokenGenerator jwtTokenGenerator, 
         IRefreshTokenGenerator refreshTokenGenerator,
@@ -32,7 +32,7 @@ public class IdentityService : IIdentityService
 
     public async Task<(bool Success, IEnumerable<string> Errors, string UserId)> CreateUserAsync(string email, string password)
     {
-        var user = new ApplicationUser
+        var user = new AuthUser
         {
             Email = email,
             UserName = email
