@@ -47,7 +47,7 @@ public class OrderRepository : IOrderRepository
 
     public async Task UpdateAsync(Order order)
     {
-        _appDbContext.Orders.Update(orders);
+        _appDbContext.Orders.Update(order);
         await _appDbContext.SaveChangesAsync();
     }
 }
