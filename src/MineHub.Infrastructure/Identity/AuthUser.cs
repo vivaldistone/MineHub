@@ -2,6 +2,7 @@
 
 namespace MineHub.Infrastructure.Identity;
 
-public class ApplicationUser : IdentityUser
+public class AuthUser : IdentityUser
 {
+
 }
