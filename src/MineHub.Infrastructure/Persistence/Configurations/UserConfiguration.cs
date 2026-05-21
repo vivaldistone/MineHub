@@ -23,7 +23,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasOne<AuthUser>()
             .WithOne()
-            .HasForeignKey<Cart>(c => c.UserId);
+            .HasForeignKey<User>(c => c.AuthUserId);
 
         builder.Property(u => u.Email)
             .HasColumnName("email")
