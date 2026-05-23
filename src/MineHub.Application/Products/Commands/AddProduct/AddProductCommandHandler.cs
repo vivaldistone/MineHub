@@ -28,9 +28,6 @@ public class AddProductCommandHandler
         await _productRepository.AddAsync(product);
 
         return new AddProductResponse(
-            product.ProductId, 
-            product.Name, 
-            product.Description, 
-            product.Price);
+            product.ProductId);
     }
 }
