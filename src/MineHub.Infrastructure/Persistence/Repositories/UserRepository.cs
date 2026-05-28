@@ -45,9 +45,9 @@ public class UserRepository : IUserRepository
         return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Id == guid);
     }
 
-    public async Task<User> GetByIdentityUserIdAsync(string identityUserId)
+    public async Task<User?> GetByIdentityUserIdAsync(string identityUserId)
     {
-        return await _appDbContext.DomainUsers.FirstAsync(u => u.AuthUserId == identityUserId);
+        return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.AuthUserId == identityUserId);
     }
 
     public async Task UpdateAsync(User user)
