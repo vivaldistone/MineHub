@@ -12,6 +12,8 @@ public class AppDbContext : IdentityDbContext<AuthUser>
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<Order> Orders => Set<Order>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
     {
     }
