@@ -30,4 +30,15 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         _appDbContext.Update(token);
         await _appDbContext.SaveChangesAsync();
     }
+
+    public async Task<RefreshToken?> GetTokenByUserAsync(string userId)
+    {
+        return await _appDbContext.RefreshTokens.FirstOrDefaultAsync(token => token.UserId == userId);
+    }
+    
+    public async Task DeleteAsync(RefreshToken refreshToken)
+    {
+        _appDbContext.Remove(refreshToken);
+        await _appDbContext.SaveChangesAsync();
+    }
 }
