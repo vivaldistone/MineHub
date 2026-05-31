@@ -2,6 +2,7 @@
 using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Abstractions.Services;
 using MineHub.Domain.Entities;
+using System.Security.Claims;
 
 namespace MineHub.Infrastructure.Identity.Services;
 
@@ -18,15 +19,15 @@ internal class DomainUserService : ICurrentDomainUserService
 
     public async Task<User> GetRequiredAsync()
     {
-        var identityName = _httpContextAccessor?.HttpContext?.User?.Identity?.Name;
+        var identityEmail = _httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
 
-        if (string.IsNullOrWhiteSpace(identityName))
+        if (string.IsNullOrWhiteSpace(identityEmail))
             throw new UnauthorizedAccessException("user not authentication");
 
-        var domainUser = await _userRepository.GetByIdentityUserIdAsync(identityName);
+        var domainUser = await _userRepository.GetByIdentityUserEmailAsync(identityEmail);
 
         if (domainUser is null)
-            throw new UnauthorizedAccessException($"Domain user '{identityName}' was not found.");
+            throw new UnauthorizedAccessException($"Domain user '{identityEmail}' was not found.");
 
         return domainUser;
     }
