@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MineHub.Application.Auth.Commands.Login;
+using MineHub.Application.Auth.Commands.Register;
 using MineHub.Application.Carts.Commands.AddItemToCart;
 using MineHub.Application.Carts.Commands.ChangeCartItemQuantity;
 using MineHub.Application.Carts.Queries.GetCart;
@@ -29,6 +31,9 @@ public static class DependencyInjection
         services.AddScoped<GetUserQueryHandler>();
         services.AddScoped<GetUsersQueryHandler>();
 
+        services.AddScoped<LoginUserCommandHandler>();
+        services.AddScoped<RegisterUserCommandHandler>();
+        
         return services;
     }
 }
