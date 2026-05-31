@@ -17,13 +17,20 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ICurrentDomainUserService, DomainUserService>();
+        services.AddScoped<IIdentityService, IdentityService>();
+        
         services.AddScoped<DatabaseSeeder>();
         services.AddScoped<ProductSeeder>();
         services.AddScoped<RoleSeeder>();
         services.AddScoped<IdentitySeeder>();
+
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+        services.AddScoped<IRefreshTokenHasher, RefreshTokenHasher>();
 
         services.AddHttpContextAccessor();
 
