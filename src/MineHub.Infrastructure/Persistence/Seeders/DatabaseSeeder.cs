@@ -15,8 +15,8 @@ public class DatabaseSeeder
 
     public async Task SeedAsync()
     {
-        await _identitySeeder.SeedAsync();
         await _roleSeeder.SeedAsync();
+        await _identitySeeder.SeedAsync();
         await _productSeeder.SeedAsync();
     }
 }

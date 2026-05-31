@@ -57,7 +57,19 @@ public class IdentitySeeder
             }
         }
 
-        var domainUser = await _userRepository.GetByIdentityUserIdAsync(authUser.Id);
+        if (!await _userManager.IsInRoleAsync(authUser, "admin"))
+        {
+            var resultAddRole = await _userManager.AddToRoleAsync(authUser, "admin");
+
+            if (!resultAddRole.Succeeded)
+            {
+                var errors = string.Join(",", resultAddRole.Errors.Select(e => e.Description));
+
+                throw new InvalidOperationException($"Failed to seed admin user {errors}");
+            }
+        }
+
+        var domainUser = await _userRepository.GetByIdentityUserEmailAsync(authUser.Email);
 
         if (domainUser is null)
         {
