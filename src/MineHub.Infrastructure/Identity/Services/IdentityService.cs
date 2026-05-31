@@ -2,6 +2,7 @@
 using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Abstractions.Services;
 using MineHub.Domain.Entities;
+using MineHub.Application.Exceptions;
 
 namespace MineHub.Infrastructure.Identity.Services;
 
@@ -61,6 +62,18 @@ public class IdentityService : IIdentityService
         return (true, new List<string>(), user.Id);
     }
 
+    public async Task<TokenUserInfo> GetTokenUserInfoAsync(string authUserId)
+    {
+        var user = await  _userManager.FindByIdAsync(authUserId);
+
+        if (user is null)
+            throw new UnauthorizedException("user not authorize", "user_not_authorize");
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        return new TokenUserInfo(user.Id, user.Email!, roles.ToList());
+    }
+
     public async Task<LoginResult> LoginAsync(string email, string password)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -76,6 +89,15 @@ public class IdentityService : IIdentityService
         var roles = await _userManager.GetRolesAsync(user);
 
         var jwtToken = _jwtGenerator.GenerateToken(user.Id, user.Email!, roles);
+
+        var oldToken = await _refreshTokenRepository
+            .GetTokenByUserAsync(user.Id);
+
+        if (oldToken is not null)
+        {
+            await _refreshTokenRepository.DeleteAsync(oldToken);
+        }    
+
         var refreshToken = _refreshTokenGenerator.Generate();
 
         var refreshTokenEntity = new RefreshToken(user.Id, _refreshTokenHasher.Hash(refreshToken), DateTime.UtcNow.AddDays(7));
