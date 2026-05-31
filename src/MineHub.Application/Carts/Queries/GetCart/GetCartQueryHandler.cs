@@ -1,6 +1,5 @@
 ﻿using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Abstractions.Services;
-using MineHub.Application.Exceptions;
 
 namespace MineHub.Application.Carts.Queries.GetCart;
 
@@ -19,9 +18,17 @@ public class GetCartQueryHandler
     {
         var domainUser = await _currentDomainUserService.GetRequiredAsync();
 
-        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id) 
-            ?? throw new NotFoundException("cart not found", "cart_not_found");
+        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id);
 
+        if (cart is null)
+        {
+            return new GetCartResponse(
+                Guid.Empty,
+                DateTime.UtcNow,
+                DateTime.UtcNow,
+                0,
+                []);
+        }
 
         return new GetCartResponse(
             cart.Id, 

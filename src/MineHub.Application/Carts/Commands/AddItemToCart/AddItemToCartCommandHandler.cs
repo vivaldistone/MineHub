@@ -1,6 +1,7 @@
 ﻿using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Abstractions.Services;
 using MineHub.Application.Exceptions;
+using MineHub.Domain.Entities;
 
 namespace MineHub.Application.Carts.Commands.AddItemToCart;
 
@@ -21,8 +22,14 @@ public class AddItemToCartCommandHandler
     {
         var domainUser = await _currentDomainUserService.GetRequiredAsync();
 
-        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id) 
-            ?? throw new NotFoundException("Cart not found", "cart_not_found");
+        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id);
+
+        if (cart is null)
+        {
+            cart = new Cart(domainUser.Id);
+
+            await _cartRepository.AddAsync(cart);
+        }
 
         var product = await _productRepository.GetByIdAsync(command.ProductId);
 
