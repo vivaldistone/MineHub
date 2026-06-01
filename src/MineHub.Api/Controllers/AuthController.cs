@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MineHub.Api.Contracts.Requests.Login;
+using MineHub.Api.Contracts.Requests.RefreshToken;
 using MineHub.Api.Contracts.Requests.Register;
 using MineHub.Application.Auth.Commands.Login;
+using MineHub.Application.Auth.Commands.RefreshToken;
 using MineHub.Application.Auth.Commands.Register;
 
 namespace MineHub.Api.Controllers;
@@ -10,13 +12,15 @@ namespace MineHub.Api.Controllers;
 [Route("/api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private LoginUserCommandHandler _loginUserHandler;
-    private RegisterUserCommandHandler _registerUserHandler;
+    private readonly LoginUserCommandHandler _loginUserHandler;
+    private readonly RegisterUserCommandHandler _registerUserHandler;
+    private readonly RefreshTokenCommandHandler _refreshTokenHandler;
 
-    public AuthController(LoginUserCommandHandler loginUserHandler, RegisterUserCommandHandler registerUserHandler)
+    public AuthController(LoginUserCommandHandler loginUserHandler, RegisterUserCommandHandler registerUserHandler, RefreshTokenCommandHandler refreshTokenHandler)
     {
         _loginUserHandler = loginUserHandler;
         _registerUserHandler = registerUserHandler;
+        _refreshTokenHandler = refreshTokenHandler;
     }
 
     [HttpPost("register")]
@@ -26,7 +30,7 @@ public class AuthController : ControllerBase
 
         await _registerUserHandler.HandleAsync(registerUserCommand);
 
-        return Created();
+        return NoContent();
     }
 
     [HttpPost("login")]
@@ -37,6 +41,17 @@ public class AuthController : ControllerBase
         var result = await _loginUserHandler.HandleAsync(loginUserCommand);
 
         return Ok(result);
+    }
+
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(RefreshTokenRequest request)
+    {
+        var refreshTokenCommand = new RefreshTokenCommand(request.Hash);
+
+        var jwt = await _refreshTokenHandler.HandleAsync(refreshTokenCommand);
+
+        return Ok(jwt);
     }
 }
 
