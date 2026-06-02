@@ -238,6 +238,45 @@ namespace MineHub.Infrastructure.Persistence.Migrations
                     b.ToTable("products", (string)null);
                 });
 
+            modelBuilder.Entity("MineHub.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("ExpiredAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expired_at_utc");
+
+                    b.Property<string>("HashToken")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("token_hash");
+
+                    b.Property<DateTime?>("RevokedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at_utc");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HashToken")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("refresh_tokens", (string)null);
+                });
+
             modelBuilder.Entity("MineHub.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -492,6 +531,16 @@ namespace MineHub.Infrastructure.Persistence.Migrations
                         });
 
                     b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("MineHub.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("MineHub.Domain.Entities.User", null)
+                        .WithOne()
+                        .HasForeignKey("MineHub.Domain.Entities.RefreshToken", "UserId")
+                        .HasPrincipalKey("MineHub.Domain.Entities.User", "AuthUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MineHub.Domain.Entities.User", b =>

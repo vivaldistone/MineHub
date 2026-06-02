@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\Responses\" />
+    <Folder Include="Contracts\Responses\Login\" />
   </ItemGroup>
 
 </Project>
