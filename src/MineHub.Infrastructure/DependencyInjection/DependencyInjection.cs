@@ -76,6 +76,12 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
 
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = "localhost:6379";
+            options.InstanceName = "MineHub:";
+        });
+
         return services;
     }
 }
