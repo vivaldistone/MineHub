@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MineHub.Application.Auth.Commands.Login;
+using MineHub.Application.Auth.Commands.RefreshToken;
 using MineHub.Application.Auth.Commands.Register;
 using MineHub.Application.Carts.Commands.AddItemToCart;
 using MineHub.Application.Carts.Commands.ChangeCartItemQuantity;
@@ -33,7 +34,9 @@ public static class DependencyInjection
 
         services.AddScoped<LoginUserCommandHandler>();
         services.AddScoped<RegisterUserCommandHandler>();
-        
+
+        services.AddScoped<RefreshTokenCommandHandler>();
+
         return services;
     }
 }
