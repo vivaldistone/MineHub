@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
       <PrivateAssets>all</PrivateAssets>
@@ -20,10 +21,6 @@
     <ProjectReference Include="..\MineHub.Application\MineHub.Application.csproj" />
     <ProjectReference Include="..\MineHub.Domain\MineHub.Domain.csproj" />
     <ProjectReference Include="..\MineHub.Infrastructure\MineHub.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Contracts\Responses\Login\" />
   </ItemGroup>
 
 </Project>
