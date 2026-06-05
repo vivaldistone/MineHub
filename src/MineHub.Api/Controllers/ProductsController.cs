@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MineHub.Api.Contracts.Requests.Products;
 using MineHub.Application.Products.Commands.AddProduct;
@@ -49,8 +50,13 @@ public class ProductsController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<IActionResult> Create(CreateProductRequest request)
+    public async Task<IActionResult> Create(CreateProductRequest request, IValidator<CreateProductRequest> validator)
     {
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+        
         var command = new AddProductCommand(request.Name, request.Description, request.Price);
         
         var result = await _addProductHandler.HandleAsync(command);
@@ -60,8 +66,13 @@ public class ProductsController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpPatch("{id}")]
-    public async Task<IActionResult> Update(Guid id, UpdateProductRequest request)
+    public async Task<IActionResult> Update(Guid id, UpdateProductRequest request, IValidator<UpdateProductRequest> validator)
     {
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+        
         var command = new UpdateProductCommand(id, request.Name, request.Description, request.Price);
 
         await _updateProductHandler.HandleAsync(command);

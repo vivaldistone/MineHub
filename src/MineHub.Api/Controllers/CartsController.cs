@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using MineHub.Api.Contracts.Requests.AddItemToCart;
 using MineHub.Application.Carts.Commands.AddItemToCart;
 using MineHub.Application.Carts.Queries.GetCart;
@@ -28,8 +29,13 @@ public class CartsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddItemToCart(AddItemToCartRequest request)
+    public async Task<IActionResult> AddItemToCart(AddItemToCartRequest request, IValidator<AddItemToCartRequest> validator)
     {
+        var resultValidate = await validator.ValidateAsync(request);
+
+        if (!resultValidate.IsValid)
+            throw new ValidationException(resultValidate.Errors);
+        
         var command = new AddItemToCartCommand(request.Id, request.Quantity);
         await _addItemToCartHandler.HandleAsync(command);
 

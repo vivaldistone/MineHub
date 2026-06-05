@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using MineHub.Api.Contracts.Requests.Login;
 using MineHub.Api.Contracts.Requests.RefreshToken;
 using MineHub.Api.Contracts.Requests.Register;
@@ -24,9 +25,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterUserRequest request)
+    public async Task<IActionResult> Register(RegisterUserRequest request, IValidator<RegisterUserRequest> validator)
     {
-        var registerUserCommand = new RegisterUserCommand(request.email, request.password);
+        var resultValidate = await validator.ValidateAsync(request);
+
+        if (!resultValidate.IsValid)
+            throw new ValidationException(resultValidate.Errors);
+        
+        var registerUserCommand = new RegisterUserCommand(request.Email, request.Password);
 
         await _registerUserHandler.HandleAsync(registerUserCommand);
 
@@ -34,9 +40,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginUserRequest request)
+    public async Task<IActionResult> Login(LoginUserRequest request, IValidator<LoginUserRequest> validator)
     {
-        var loginUserCommand = new LoginUserCommand(request.email, request.password);
+        var resultValidate = await validator.ValidateAsync(request);
+
+        if (!resultValidate.IsValid)
+            throw new ValidationException(resultValidate.Errors);
+
+        var loginUserCommand = new LoginUserCommand(request.Email, request.Password);
 
         var result = await _loginUserHandler.HandleAsync(loginUserCommand);
 
