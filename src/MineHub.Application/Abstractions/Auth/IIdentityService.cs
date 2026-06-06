@@ -1,4 +1,6 @@
-﻿namespace MineHub.Application.Abstractions.Services;
+﻿using MineHub.Application.Abstractions.Services;
+
+namespace MineHub.Application.Abstractions.Auth;
 
 public interface IIdentityService
 {

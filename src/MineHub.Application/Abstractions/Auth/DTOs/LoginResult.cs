@@ -1,4 +1,4 @@
-﻿namespace MineHub.Application.Abstractions.Services;
+﻿namespace MineHub.Application.Abstractions.Auth.DTOs;
 
 public record LoginResult(
     bool Success,

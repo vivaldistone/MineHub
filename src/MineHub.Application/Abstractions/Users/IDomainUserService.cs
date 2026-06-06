@@ -1,5 +1,5 @@
 ﻿using MineHub.Domain.Entities;
-namespace MineHub.Application.Abstractions.Services;
+namespace MineHub.Application.Abstractions.Users;
 
 public interface ICurrentDomainUserService
 {
