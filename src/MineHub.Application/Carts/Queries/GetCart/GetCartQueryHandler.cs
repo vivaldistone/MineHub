@@ -1,40 +1,38 @@
-﻿using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Services;
+﻿using MineHub.Application.Abstractions.Cache;
+using MineHub.Application.Abstractions.Users;
+using MineHub.Application.Abstractions.Cache.DTOs;
 
 namespace MineHub.Application.Carts.Queries.GetCart;
 
 public class GetCartQueryHandler
 {
-    private readonly ICartRepository _cartRepository;
     private readonly ICurrentDomainUserService _currentDomainUserService;
+    private readonly ICartCacheService _cartCacheService;
 
-    public GetCartQueryHandler(ICartRepository cartRepository, ICurrentDomainUserService currentDomainUserService)
+    public GetCartQueryHandler(ICurrentDomainUserService currentDomainUserService, ICartCacheService cartCacheService)
     {
-        _cartRepository = cartRepository;
         _currentDomainUserService = currentDomainUserService;
+        _cartCacheService = cartCacheService;
     }
 
     public async Task<GetCartResponse> HandleAsync()
-    {
+    {     
         var domainUser = await _currentDomainUserService.GetRequiredAsync();
 
-        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id);
+        var cart = await _cartCacheService.GetCartAsync(domainUser.Id);
 
         if (cart is null)
         {
-            return new GetCartResponse(
-                Guid.Empty,
-                DateTime.UtcNow,
-                DateTime.UtcNow,
-                0,
-                []);
+            cart = new CartCacheDto(domainUser.Id);
+
+            await _cartCacheService.SetCartAsync(domainUser.Id, cart, TimeSpan.FromDays(7));
         }
 
         return new GetCartResponse(
-            cart.Id, 
-            cart.CreatedAtUtc, 
+            cart.Id,
+            cart.CreatedAtUtc,
             cart.UpdatedAtUtc,
-            cart.TotalPrice,
+            cart.CartItems.Sum(c => c.TotalPrice),
 
             cart.CartItems.Select(c => new GetCartItemResponse(
             c.ProductId,

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MineHub.Application.Abstractions.Cache;
 using MineHub.Application.Auth.Commands.Login;
 using MineHub.Application.Auth.Commands.RefreshToken;
 using MineHub.Application.Auth.Commands.Register;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Services;
+using MineHub.Application.Abstractions.Users;
 using MineHub.Domain.Entities;
 using System.Security.Claims;
 

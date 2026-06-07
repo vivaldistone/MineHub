@@ -1,4 +1,4 @@
-﻿using MineHub.Application.Abstractions.Services;
+﻿using MineHub.Application.Abstractions.Auth.DTOs;
 
 namespace MineHub.Application.Abstractions.Auth;
 

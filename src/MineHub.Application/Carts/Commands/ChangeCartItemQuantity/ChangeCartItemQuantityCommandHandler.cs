@@ -1,28 +1,37 @@
-﻿using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Services;
-using MineHub.Application.Exceptions;
+﻿using MineHub.Application.Exceptions;
+using MineHub.Application.Abstractions.Cache;
+using MineHub.Application.Abstractions.Users;
+using MineHub.Application.Abstractions.Carts;
 
 namespace MineHub.Application.Carts.Commands.ChangeCartItemQuantity;
 
 public class ChangeCartItemQuantityCommandHandler
 {
-    private readonly ICartRepository _cartRepository;
     private readonly ICurrentDomainUserService _currentDomainUserService;
+    private readonly ICartCacheService _cartCacheService;
+    private readonly ICartService _cartService;
 
-    public ChangeCartItemQuantityCommandHandler(ICartRepository cartRepository, ICurrentDomainUserService currentDomainUserService)
+    public ChangeCartItemQuantityCommandHandler(
+        ICurrentDomainUserService currentDomainUserService,
+        ICartCacheService cartCacheService,
+        ICartService cartService)
     {
-        _cartRepository = cartRepository;
         _currentDomainUserService = currentDomainUserService;
+        _cartCacheService = cartCacheService;
+        _cartService = cartService;
     }
 
     public async Task HandleAsync(ChangeCartItemQuantityCommand command)
     {
         var user = await _currentDomainUserService.GetRequiredAsync();
 
-        var cart = await _cartRepository.GetByUserIdAsync(user.Id)
-            ?? throw new NotFoundException("Cart not found", "cart_not_found");
+        var cachedCart = await _cartCacheService.GetCartAsync(user.Id);
 
-        cart.ChangeQuantity(command.ProductId, command.Quantity);
-        await _cartRepository.UpdateAsync(cart);
+        if (cachedCart is null)
+            throw new NotFoundException("Cart not found in cache", "cart_not_found_in_cache");
+
+        _cartService.ChangeQuantity(cachedCart,command.ProductId,command.Quantity);
+
+        await _cartCacheService.SetCartAsync(user.Id,cachedCart, TimeSpan.FromDays(7));
     }
 }

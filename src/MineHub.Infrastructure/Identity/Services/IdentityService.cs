@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Services;
 using MineHub.Domain.Entities;
 using MineHub.Application.Exceptions;
+using MineHub.Application.Abstractions.Auth;
+using MineHub.Application.Abstractions.Auth.DTOs;
 
 namespace MineHub.Infrastructure.Identity.Services;
 

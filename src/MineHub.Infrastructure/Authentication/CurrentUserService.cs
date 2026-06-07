@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using MineHub.Application.Abstractions.Services;
+using MineHub.Application.Abstractions.Users;
 using System.Security.Claims;
 
 namespace MineHub.Infrastructure.Authentication;

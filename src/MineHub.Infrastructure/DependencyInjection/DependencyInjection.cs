@@ -1,18 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using MineHub.Application.Abstractions.Auth;
+using MineHub.Application.Abstractions.Cache;
+using MineHub.Application.Abstractions.Carts;
 using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Services;
+using MineHub.Application.Abstractions.Users;
 using MineHub.Infrastructure.Authentication;
 using MineHub.Infrastructure.Identity;
 using MineHub.Infrastructure.Identity.Services;
 using MineHub.Infrastructure.Persistence;
 using MineHub.Infrastructure.Persistence.Repositories;
 using MineHub.Infrastructure.Persistence.Seeders;
+using MineHub.Infrastructure.Redis;
 using System.Text;
 
 namespace MineHub.Infrastructure.DependencyInjection;
@@ -81,6 +84,10 @@ public static class DependencyInjection
             options.Configuration = "localhost:6379";
             options.InstanceName = "MineHub:";
         });
+
+        services.AddSingleton<ICacheService, RedisCacheService>();
+        services.AddSingleton<ICartCacheService, CartCacheService>();
+        services.AddScoped<ICartService, CartService>();
 
         return services;
     }

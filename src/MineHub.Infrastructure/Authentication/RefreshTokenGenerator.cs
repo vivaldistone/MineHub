@@ -1,5 +1,5 @@
 ﻿using System.Security.Cryptography;
-using MineHub.Application.Abstractions.Services;
+using MineHub.Application.Abstractions.Auth;
 
 namespace MineHub.Infrastructure.Authentication;
 

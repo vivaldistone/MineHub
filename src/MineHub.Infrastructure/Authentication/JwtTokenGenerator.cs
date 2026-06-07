@@ -1,9 +1,9 @@
-﻿using MineHub.Application.Abstractions.Services;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MineHub.Application.Abstractions.Auth;
 
 namespace MineHub.Infrastructure.Authentication
 {

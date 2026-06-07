@@ -1,5 +1,5 @@
-﻿using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Services;
+﻿using MineHub.Application.Abstractions.Auth;
+using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Exceptions;
 
 namespace MineHub.Application.Auth.Commands.RefreshToken;

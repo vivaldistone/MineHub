@@ -1,4 +1,4 @@
-﻿using MineHub.Application.Abstractions.Services;
+﻿using MineHub.Application.Abstractions.Auth;
 using MineHub.Application.Exceptions;
 
 namespace MineHub.Application.Auth.Commands.Login;
