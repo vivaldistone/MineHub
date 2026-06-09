@@ -72,7 +72,7 @@ public class CartService : ICartService
         cart.UpdatedAtUtc = DateTime.UtcNow;
     }
 
-    public void RefreshItemsFromProducts(CartCacheDto cart, IEnumerable<Product> productsInCart)
+    public bool RefreshItemsFromProducts(CartCacheDto cart, IEnumerable<Product> productsInCart)
     {
         var wasUpdatedCart = false;
 
@@ -102,6 +102,8 @@ public class CartService : ICartService
 
         if (wasUpdatedCart)
             cart.UpdatedAtUtc = DateTime.UtcNow;
+
+        return wasUpdatedCart;
     }
 
     public void RemoveItem(CartCacheDto cart, Guid productId)

@@ -9,5 +9,5 @@ public interface ICartService
     void RemoveItem(CartCacheDto cart, Guid productId);
     void Clear(CartCacheDto cart);
     void ChangeQuantity(CartCacheDto cart, Guid productId, int quantity);
-    void RefreshItemsFromProducts(CartCacheDto cart, IEnumerable<Product> productsInCart);
+    bool RefreshItemsFromProducts(CartCacheDto cart, IEnumerable<Product> productsInCart);
 }
