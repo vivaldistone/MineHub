@@ -51,4 +51,12 @@ public class ProductRepository : IProductRepository
         _appDbContext.Products.Update(product);
         await _appDbContext.SaveChangesAsync();
     }
+
+    public async Task<List<Product>> GetByIdsAsync(List<Guid> productIds)
+    {
+        return await _appDbContext
+            .Products
+            .Where(p => productIds.Contains(p.ProductId))
+            .ToListAsync();
+    }
 }
