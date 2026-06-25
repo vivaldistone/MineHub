@@ -13,46 +13,46 @@ public class UserRepository : IUserRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task AddAsync(User user)
+    public async Task AddAsync(User user, CancellationToken token)
     {
-        await _appDbContext.DomainUsers.AddAsync(user);
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.DomainUsers.AddAsync(user, token);
+        await _appDbContext.SaveChangesAsync(token);
     }
 
-    public async Task DeleteAsync(User user)
+    public async Task DeleteAsync(User user, CancellationToken token)
     {
         _appDbContext.DomainUsers.Remove(user);
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync(token);
     }
 
-    public async Task<bool> ExistsAsync(Guid id)
+    public async Task<bool> ExistsAsync(Guid id , CancellationToken token)
     {
-        return await _appDbContext.DomainUsers.AnyAsync(u => u.Id == id);
+        return await _appDbContext.DomainUsers.AnyAsync(u => u.Id == id, token);
     }
 
-    public async Task<IReadOnlyCollection<User>> GetAllAsync()
+    public async Task<IReadOnlyCollection<User>> GetAllAsync(CancellationToken token)
     {
-        return await _appDbContext.DomainUsers.ToListAsync();
+        return await _appDbContext.DomainUsers.ToListAsync(token);
     }
 
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken token)
     {
-        return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email ==  email);
+        return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email ==  email, token);
     }
 
-    public async Task<User?> GetByIdAsync(Guid guid)
+    public async Task<User?> GetByIdAsync(Guid guid, CancellationToken token)
     {
-        return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Id == guid);
+        return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Id == guid, token);
     }
 
-    public async Task<User?> GetByIdentityUserEmailAsync(string email)
+    public async Task<User?> GetByIdentityUserEmailAsync(string email, CancellationToken token)
     {
-        return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email == email);
+        return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email == email, token);
     }
 
-    public async Task UpdateAsync(User user)
+    public async Task UpdateAsync(User user, CancellationToken token)
     {
         _appDbContext.DomainUsers.Update(user);
-        await _appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync(token);
     }
 }
