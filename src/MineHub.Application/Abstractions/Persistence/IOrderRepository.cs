@@ -10,5 +10,4 @@ public interface IOrderRepository
     Task<Order?> GetByUserIdAndOrderIdAsync(Guid userId, Guid orderId, CancellationToken token);
     Task<Order?> GetCreatedByUserIdAsync(Guid userId, CancellationToken token);
     Task AddAsync(Order order, CancellationToken token);
-    Task UpdateAsync(Order order, CancellationToken token); 
 }

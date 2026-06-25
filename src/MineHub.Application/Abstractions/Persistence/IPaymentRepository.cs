@@ -9,5 +9,4 @@ public interface IPaymentRepository
     Task<Payment?> GetByIdAsync(Guid id, CancellationToken token);
     Task<Payment?> GetPendingByOrderIdAsync(Guid orderId, CancellationToken token);
     Task<Payment?> GetByProviderPaymentIdAsync(string providerPaymentId, CancellationToken token);
-    Task UpdateAsync(Payment payment, CancellationToken token);
 }
