@@ -4,9 +4,9 @@ namespace MineHub.Application.Abstractions.Persistence;
 
 public interface IRefreshTokenRepository
 {
-    Task AddAsync(RefreshToken refreshToken);
-    Task<RefreshToken> GetRefreshTokenAsync(string hash);
-    Task UpdateAsync(RefreshToken token);
-    Task<RefreshToken?> GetTokenByUserAsync(string userId);
-    Task DeleteAsync(RefreshToken refreshToken);
+    Task AddAsync(RefreshToken refreshToken, CancellationToken token);
+    Task<RefreshToken> GetRefreshTokenAsync(string hash, CancellationToken token);
+    Task UpdateAsync(RefreshToken refreshToken, CancellationToken token);
+    Task<RefreshToken?> GetTokenByUserAsync(string userId, CancellationToken token);
+    Task DeleteAsync(RefreshToken refreshToken, CancellationToken token);
 }
