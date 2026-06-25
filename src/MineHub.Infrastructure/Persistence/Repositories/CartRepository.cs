@@ -16,7 +16,6 @@ public class CartRepository : ICartRepository
     public async Task AddAsync(Cart cart, CancellationToken token)
     {
         await _appDbContext.Carts.AddAsync(cart, token);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task<Cart?> GetByIdAsync(Guid id, CancellationToken token)
@@ -27,11 +26,5 @@ public class CartRepository : ICartRepository
     public async Task<Cart?> GetByUserIdAsync(Guid userId, CancellationToken token)
     {
         return await _appDbContext.Carts.FirstOrDefaultAsync(c => c.UserId == userId, token);
-    }
-
-    public async Task UpdateAsync(Cart cart, CancellationToken token)
-    {
-        _appDbContext.Carts.Update(cart);
-        await _appDbContext.SaveChangesAsync(token);
     }
 }

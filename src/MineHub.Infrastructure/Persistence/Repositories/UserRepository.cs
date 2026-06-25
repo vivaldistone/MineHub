@@ -16,13 +16,11 @@ public class UserRepository : IUserRepository
     public async Task AddAsync(User user, CancellationToken token)
     {
         await _appDbContext.DomainUsers.AddAsync(user, token);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task DeleteAsync(User user, CancellationToken token)
     {
         _appDbContext.DomainUsers.Remove(user);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task<bool> ExistsAsync(Guid id , CancellationToken token)
@@ -48,11 +46,5 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByIdentityUserEmailAsync(string email, CancellationToken token)
     {
         return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email == email, token);
-    }
-
-    public async Task UpdateAsync(User user, CancellationToken token)
-    {
-        _appDbContext.DomainUsers.Update(user);
-        await _appDbContext.SaveChangesAsync(token);
     }
 }

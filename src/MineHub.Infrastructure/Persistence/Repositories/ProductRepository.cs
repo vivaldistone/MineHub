@@ -13,17 +13,14 @@ public class ProductRepository : IProductRepository
         _appDbContext = appDbContext;
     }
 
-
     public async Task AddAsync(Product product, CancellationToken token)
     {
         await _appDbContext.Products.AddAsync(product, token);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task DeleteAsync(Product product, CancellationToken token)
     {
         _appDbContext.Products.Remove(product);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken token)
@@ -44,12 +41,6 @@ public class ProductRepository : IProductRepository
     public async Task<Product?> GetByNameAsync(string name, CancellationToken token)
     {
         return await _appDbContext.Products.FirstOrDefaultAsync(p => p.Name == name, token);
-    }
-
-    public async Task UpdateAsync(Product product, CancellationToken token)
-    {
-        _appDbContext.Products.Update(product);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task<List<Product>> GetByIdsAsync(List<Guid> productIds, CancellationToken token)

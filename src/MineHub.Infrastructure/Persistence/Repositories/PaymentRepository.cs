@@ -17,7 +17,6 @@ public class PaymentRepository : IPaymentRepository
     public async Task AddAsync(Payment payment, CancellationToken token)
     {
         await _appDbContext.Payments.AddAsync(payment, token);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task<List<Payment>> GetAllAsync(CancellationToken token)
@@ -45,11 +44,5 @@ public class PaymentRepository : IPaymentRepository
         return await _appDbContext.Payments
             .FirstOrDefaultAsync(p =>
                 p.ProviderPaymentId == providerPaymentId, token);
-    }
-
-    public async Task UpdateAsync(Payment payment, CancellationToken token)
-    {
-        _appDbContext.Payments.Update(payment);
-        await _appDbContext.SaveChangesAsync(token);
     }
 }

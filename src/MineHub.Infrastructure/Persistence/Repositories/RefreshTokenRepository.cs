@@ -16,19 +16,12 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     public async Task AddAsync(RefreshToken refreshToken, CancellationToken token)
     {
         await _appDbContext.RefreshTokens.AddAsync(refreshToken, token);
-        await _appDbContext.SaveChangesAsync();
     }
 
     public async Task<RefreshToken> GetRefreshTokenAsync(string hash, CancellationToken token)
     {
         return await _appDbContext.RefreshTokens
             .FirstAsync(token => token.HashToken == hash, token);
-    }
-
-    public async Task UpdateAsync(RefreshToken refreshToken, CancellationToken token)
-    {
-        _appDbContext.Update(refreshToken);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task<RefreshToken?> GetTokenByUserAsync(string userId, CancellationToken token)
@@ -39,6 +32,5 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     public async Task DeleteAsync(RefreshToken refreshToken, CancellationToken token)
     {
         _appDbContext.Remove(refreshToken);
-        await _appDbContext.SaveChangesAsync(token);
     }
 }

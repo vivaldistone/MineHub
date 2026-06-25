@@ -17,7 +17,6 @@ public class OrderRepository : IOrderRepository
     public async Task AddAsync(Order order, CancellationToken token)
     {
         _appDbContext.Orders.Add(order);
-        await _appDbContext.SaveChangesAsync(token);
     }
 
     public async Task<IReadOnlyCollection<Order>> GetAllAsync(CancellationToken token)
@@ -43,11 +42,5 @@ public class OrderRepository : IOrderRepository
     public async Task<Order?> GetCreatedByUserIdAsync(Guid userId, CancellationToken token)
     {
         return await _appDbContext.Orders.FirstOrDefaultAsync(o => o.UserId == userId && o.Status == OrderStatus.Created, token);
-    }
-
-    public async Task UpdateAsync(Order order, CancellationToken token)
-    {
-        _appDbContext.Orders.Update(order);
-        await _appDbContext.SaveChangesAsync(token);
     }
 }
