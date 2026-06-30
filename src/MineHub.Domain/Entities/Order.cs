@@ -40,11 +40,28 @@ public class Order
         _orderItems.AddRange(items);
     }
 
-    public void Pay()
+    public void MarkAsPaid(Payment payment)
     {
         if (Status != OrderStatus.Created)
-            throw new DomainException("Status not created", "invalid_order_status");    
-            
+            throw new DomainException(
+                "Status not created", 
+                "invalid_order_status");
+
+        if (payment.Amount != TotalPrice)
+            throw new DomainException(
+                "Invalid Amount", 
+                "invalid_amount");
+
+        if (payment.Status != PaymentStatus.Succeeded)
+            throw new DomainException(
+            "Payment is not succeeded",
+            "invalid_payment_status");
+
+        if (payment.OrderId != Id)
+            throw new DomainException(
+            "Payment does not belong to order",
+            "invalid_payment_order");
+
         Status = OrderStatus.Paid;
         PaidAtUtc = DateTime.UtcNow;
     }

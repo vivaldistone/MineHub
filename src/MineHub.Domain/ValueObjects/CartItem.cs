@@ -5,8 +5,8 @@ namespace MineHub.Domain.ValueObjects;
 public sealed record CartItem
 {
     public Guid ProductId { get;}
-    public string ProductName { get;}
-    public string Description { get;}
+    public string ProductName { get; } = string.Empty;
+    public string Description { get;} = string.Empty;
     public decimal UnitPrice { get;}
     public int Quantity { get;}
     public decimal TotalPrice => UnitPrice * Quantity;

@@ -7,31 +7,26 @@ public class User
 {
     public Guid Id { get; private set; }
     public string AuthUserId { get; private set; } = string.Empty;
-    public string Email { get; private set; } = string.Empty;
+    public Email Email { get; private set; } 
     public DateTime CreatedAtUtc { get; private set; }
     public MinecraftProfile? MinecraftProfile { get; private set; }
 
     private User() { }
 
-    public User(string authUserId, string email)
+    public User(string authUserId, Email email)
     {
         if (string.IsNullOrWhiteSpace(authUserId))
             throw new DomainException("Auth User Id is required", "invalid_identity_user_id");
-        if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("User Email is required", "invalid_user_email");
 
         Id = Guid.NewGuid();
         AuthUserId = authUserId.Trim();
-        Email = email.Trim();
+        Email = email;
         CreatedAtUtc = DateTime.UtcNow;
     }
 
-    public void ChangeEmail(string email)
+    public void ChangeEmail(Email email)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("User Email is required", "invalid_user_email");
-
-        Email = email.Trim();
+        Email = email;
     }
 
     public void LinkMinecraftProfile(MinecraftProfile profile)

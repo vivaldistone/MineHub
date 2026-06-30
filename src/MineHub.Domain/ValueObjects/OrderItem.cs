@@ -4,11 +4,11 @@ namespace MineHub.Domain.ValueObjects;
 
 public sealed record OrderItem
 {
-    public Guid ProductId { get; private set; }
-    public string Name { get; private set; } = string.Empty;
-    public string Description { get; private set; } = string.Empty;
-    public decimal UnitPrice { get; private set; }
-    public int Quantity { get; private set; }
+    public Guid ProductId { get; }
+    public string Name { get; } = string.Empty;
+    public string Description { get; } = string.Empty;
+    public decimal UnitPrice { get; }
+    public int Quantity { get; }
     public decimal TotalPrice => UnitPrice * Quantity;
 
     public OrderItem(Guid productId, string name, string description, decimal unitPrice, int quantity)
