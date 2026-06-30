@@ -1,11 +1,9 @@
 ﻿namespace MineHub.Application.Exceptions;
 
-public class ConflictException : Exception
+public sealed class ConflictException : ApplicationException
 {
-    public string Code { get; private set; }
-
-    public ConflictException(string message, string code) : base(message)
-    {
-        Code = code;
+    public ConflictException(string message, string code) 
+        : base(message, code)
+    { 
     }
 }

@@ -1,10 +1,11 @@
 ﻿namespace MineHub.Application.Exceptions;
-
-public class InvalidCredentialsException : Exception
+/// <summary>
+/// Учётные данные пользователя неверны.
+/// </summary>
+public sealed class InvalidCredentialsException : ApplicationException
 {
-    public string StatusCode { get; private set; }
-    public InvalidCredentialsException(string message, string statusCode) : base(message)
+    public InvalidCredentialsException(string message, string code) 
+        : base (message, code)
     {
-        StatusCode = statusCode;
     }
 }

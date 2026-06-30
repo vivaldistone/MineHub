@@ -1,10 +1,12 @@
 ﻿namespace MineHub.Application.Exceptions;
 
-public class UnauthorizedException : Exception
+/// <summary>
+/// Пользователь аутентифицирован, но ему нельзя выполнять действие
+/// </summary>
+public sealed class UnauthorizedException : ApplicationException
 {
-    public string Code { get; private set; }
-    public UnauthorizedException(string message, string code) : base(message)
+    public UnauthorizedException(string message, string code) 
+        : base(message, code) 
     {
-        Code = code;
     }
 }

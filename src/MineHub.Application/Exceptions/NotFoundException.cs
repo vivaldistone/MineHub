@@ -1,10 +1,9 @@
 ﻿namespace MineHub.Application.Exceptions;
 
-public class NotFoundException : Exception
+public sealed class NotFoundException : ApplicationException
 {
-    public string Code { get; private set; }
-    public NotFoundException(string message, string code) : base(message)
+    public NotFoundException(string message, string code) 
+        : base(message, code)
     {
-        Code = code;
     }
 }
