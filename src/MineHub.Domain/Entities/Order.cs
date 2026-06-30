@@ -12,39 +12,32 @@ public class Order
     public Guid UserId { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public OrderStatus Status { get; private set; }
+    public DateTime? PaidAtUtc { get; private set; }
+    public DateTime? CancelledAtUtc { get; private set; }
     public decimal TotalPrice => _orderItems.Sum(o => o.TotalPrice);
     public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
     private Order() { }
     
-    private Order(Guid userId)
+    public Order(Guid userId, IEnumerable<OrderItem> orderItems)
     {
         if (userId == Guid.Empty)
-            throw new DomainException("User id is required", "invalid_user_id");
+            throw new DomainException("User id must be not empty", "user_id_must_be_not_empty");
+
+        if (orderItems is null)
+            throw new DomainException("Order items are required", "order_items_are_required");
+
+        var items = orderItems.ToList();
+
+        if (!items.Any())
+            throw new DomainException("Order items are empty", "order_items_empty");
 
         Id = Guid.NewGuid();
         UserId = userId;
         CreatedAtUtc = DateTime.UtcNow;
         Status = OrderStatus.Created;
-    }
 
-    public static Order Create(Cart cart)
-    {
-        if (cart is null)
-            throw new DomainException("Cart is required", "invalid_cart");
-        if (!cart.CartItems.Any())
-            throw new DomainException("Cart is empty", "empty_cart");
-        
-        var order = new Order(cart.UserId);
-
-        order._orderItems.AddRange(cart.CartItems.Select(c =>
-        new OrderItem(c.ProductId,
-        c.ProductName,
-        c.Description,
-        c.UnitPrice,
-        c.Quantity)));
-
-        return order;
+        _orderItems.AddRange(items);
     }
 
     public void Pay()
@@ -53,6 +46,7 @@ public class Order
             throw new DomainException("Status not created", "invalid_order_status");    
             
         Status = OrderStatus.Paid;
+        PaidAtUtc = DateTime.UtcNow;
     }
 
     public void Cancel()
@@ -61,5 +55,6 @@ public class Order
             throw new DomainException("Status not created", "invalid_order_status");
         
         Status = OrderStatus.Cancelled;
+        CancelledAtUtc = DateTime.UtcNow;
     }
 }
