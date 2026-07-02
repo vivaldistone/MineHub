@@ -1,4 +1,4 @@
-﻿using MineHub.Application.Abstractions.Cache.DTOs;
+﻿using MineHub.Application.Carts.DTOs;
 using MineHub.Domain.Entities;
 
 namespace MineHub.Application.Abstractions.Carts;
