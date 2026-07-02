@@ -3,5 +3,5 @@ namespace MineHub.Application.Abstractions.Users;
 
 public interface ICurrentDomainUserService
 {
-    Task<User> GetRequiredAsync();
+    Task<User> GetRequiredAsync(CancellationToken token);
 }
