@@ -3,11 +3,11 @@ using System.Net.Mail;
 
 namespace MineHub.Domain.ValueObjects;
 
-public sealed record Email
+public sealed record EmailAdress
 {
     public string Value { get; }
 
-    public Email(string value)
+    public EmailAdress(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new DomainException("Email is required", "email_is_required");
