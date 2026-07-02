@@ -1,19 +1,19 @@
 ﻿using MineHub.Domain.ValueObjects;
 using MineHub.Domain.Exceptions;
+using MineHub.Domain.Shared;
 
 namespace MineHub.Domain.Entities;
 
-public class User
+public class User : AggregateRoot
 {
-    public Guid Id { get; private set; }
     public string AuthUserId { get; private set; } = string.Empty;
-    public Email Email { get; private set; } 
+    public EmailAdress Email { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public MinecraftProfile? MinecraftProfile { get; private set; }
 
     private User() { }
 
-    public User(string authUserId, Email email)
+    public User(string authUserId, EmailAdress email)
     {
         if (string.IsNullOrWhiteSpace(authUserId))
             throw new DomainException("Auth User Id is required", "invalid_identity_user_id");
@@ -24,7 +24,7 @@ public class User
         CreatedAtUtc = DateTime.UtcNow;
     }
 
-    public void ChangeEmail(Email email)
+    public void ChangeEmail(EmailAdress email)
     {
         Email = email;
     }

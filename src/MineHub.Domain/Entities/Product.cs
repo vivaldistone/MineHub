@@ -1,9 +1,9 @@
 ﻿using MineHub.Domain.Exceptions;
+using MineHub.Domain.Shared;
 
 namespace MineHub.Domain.Entities;
-public class Product
+public class Product : AggregateRoot
 {
-    public Guid ProductId { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public decimal Price { get; private set; }
@@ -20,7 +20,7 @@ public class Product
         if (price <= 0)
             throw new DomainException("Price must be greater than zero", "invalid_price");
         
-        ProductId = Guid.NewGuid();
+        Id = Guid.NewGuid();
         Name = name.Trim();
         Description = description.Trim();
         Price = price;

@@ -1,14 +1,13 @@
 ﻿using MineHub.Domain.Enums;
 using MineHub.Domain.ValueObjects;
 using MineHub.Domain.Exceptions;
+using MineHub.Domain.Shared;
 
 namespace MineHub.Domain.Entities;
 
-public class Order
+public class Order : AggregateRoot
 {
     private readonly List<OrderItem> _orderItems = new();
-    
-    public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public OrderStatus Status { get; private set; }

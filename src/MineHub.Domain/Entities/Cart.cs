@@ -1,13 +1,12 @@
 ﻿using MineHub.Domain.ValueObjects;
 using MineHub.Domain.Exceptions;
+using MineHub.Domain.Shared;
 
 namespace MineHub.Domain.Entities;
 
-public class Cart
+public class Cart : AggregateRoot
 {
     private List<CartItem> _cartItems = new (); 
-    
-    public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public DateTime UpdatedAtUtc { get; private set; }
@@ -34,14 +33,14 @@ public class Cart
         if (!product.IsActive)
             throw new DomainException("Product is not active", "product_not_active");
 
-        var index = _cartItems.FindIndex(p => p.ProductId == product.ProductId);
+        var index = _cartItems.FindIndex(p => p.ProductId == product.Id);
         
         if (index != -1)
         {
             var existingItem = _cartItems[index];
             
             var updatedItem = new CartItem(
-                product.ProductId, 
+                product.Id, 
                 product.Name,
                 product.Description,
                 product.Price, 
@@ -52,7 +51,7 @@ public class Cart
             return;
         }
 
-        _cartItems.Add(new CartItem(product.ProductId, product.Name, product.Description, product.Price, quantity));
+        _cartItems.Add(new CartItem(product.Id, product.Name, product.Description, product.Price, quantity));
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
@@ -110,7 +109,7 @@ public class Cart
         
         foreach (var product in productsInCart)
         {
-            var index = _cartItems.FindIndex(c => c.ProductId == product.ProductId);
+            var index = _cartItems.FindIndex(c => c.ProductId == product.Id);
             
             if (index == -1)
                 continue;
