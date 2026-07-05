@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MineHub.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MineHub.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260618162232_MakeProviderPaymentIdNullable")]
+    partial class MakeProviderPaymentIdNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,6 +157,32 @@ namespace MineHub.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MineHub.Domain.Entities.Cart", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("carts", (string)null);
+                });
+
             modelBuilder.Entity("MineHub.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -161,14 +190,14 @@ namespace MineHub.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime?>("CancelledAtUtc")
+                    b.Property<DateTime>("CancelledAtUtc")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
-                    b.Property<DateTime?>("PaidAtUtc")
+                    b.Property<DateTime>("PaidAtUtc")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
@@ -229,7 +258,7 @@ namespace MineHub.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MineHub.Domain.Entities.Product", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("product_id");
@@ -254,7 +283,7 @@ namespace MineHub.Infrastructure.Persistence.Migrations
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("price");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductId");
 
                     b.ToTable("products", (string)null);
                 });
@@ -316,7 +345,9 @@ namespace MineHub.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("email");
 
                     b.HasKey("Id");
 
@@ -329,7 +360,7 @@ namespace MineHub.Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("MineHub.Infrastructure.Auth.Entities.AuthUser", b =>
+            modelBuilder.Entity("MineHub.Infrastructure.Identity.AuthUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -404,7 +435,7 @@ namespace MineHub.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("MineHub.Infrastructure.Auth.Entities.AuthUser", null)
+                    b.HasOne("MineHub.Infrastructure.Identity.AuthUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -413,7 +444,7 @@ namespace MineHub.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("MineHub.Infrastructure.Auth.Entities.AuthUser", null)
+                    b.HasOne("MineHub.Infrastructure.Identity.AuthUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -428,7 +459,7 @@ namespace MineHub.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MineHub.Infrastructure.Auth.Entities.AuthUser", null)
+                    b.HasOne("MineHub.Infrastructure.Identity.AuthUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -437,11 +468,65 @@ namespace MineHub.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("MineHub.Infrastructure.Auth.Entities.AuthUser", null)
+                    b.HasOne("MineHub.Infrastructure.Identity.AuthUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MineHub.Domain.Entities.Cart", b =>
+                {
+                    b.HasOne("MineHub.Domain.Entities.User", null)
+                        .WithOne()
+                        .HasForeignKey("MineHub.Domain.Entities.Cart", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("MineHub.Domain.ValueObjects.CartItem", "CartItems", b1 =>
+                        {
+                            b1.Property<Guid>("id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Description")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)")
+                                .HasColumnName("description");
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("product_id");
+
+                            b1.Property<string>("ProductName")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)")
+                                .HasColumnName("product_name");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("integer")
+                                .HasColumnName("quantity");
+
+                            b1.Property<decimal>("UnitPrice")
+                                .HasColumnType("numeric(18,2)")
+                                .HasColumnName("unit_price");
+
+                            b1.Property<Guid>("cart_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("id");
+
+                            b1.HasIndex("cart_id");
+
+                            b1.ToTable("cart_items", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("cart_id");
+                        });
+
+                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("MineHub.Domain.Entities.Order", b =>
@@ -519,7 +604,7 @@ namespace MineHub.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MineHub.Domain.Entities.User", b =>
                 {
-                    b.HasOne("MineHub.Infrastructure.Auth.Entities.AuthUser", null)
+                    b.HasOne("MineHub.Infrastructure.Identity.AuthUser", null)
                         .WithOne()
                         .HasForeignKey("MineHub.Domain.Entities.User", "AuthUserId")
                         .OnDelete(DeleteBehavior.Cascade)
