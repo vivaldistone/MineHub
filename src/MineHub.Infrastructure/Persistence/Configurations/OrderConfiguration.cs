@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MineHub.Domain.Entities;
-using MineHub.Domain.ValueObjects;
 
 namespace MineHub.Infrastructure.Persistence.Configurations;
 

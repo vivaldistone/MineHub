@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MineHub.Domain.Entities;
-using MineHub.Infrastructure.Identity;
+using MineHub.Domain.ValueObjects;
+using MineHub.Infrastructure.Auth.Entities;
 
 namespace MineHub.Infrastructure.Persistence.Configurations;
 
@@ -26,9 +27,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey<User>(c => c.AuthUserId);
 
         builder.Property(u => u.Email)
-            .HasColumnName("email")
-            .HasMaxLength(255)
-            .IsRequired();
+            .HasConversion(
+            email => email.Value,
+            value => new EmailAdress(value));
 
         builder.HasIndex(u => u.Email)
             .IsUnique();
