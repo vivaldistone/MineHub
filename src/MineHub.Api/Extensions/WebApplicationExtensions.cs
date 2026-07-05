@@ -4,13 +4,13 @@ namespace MineHub.Api.Extensions;
 
 public static class WebApplicationExtensions
 {
-    public static async Task SeedDatabaseAsync(this WebApplication app)
+    public static async Task SeedDatabaseAsync(this WebApplication app, CancellationToken token)
     {
         using var scope = app.Services.CreateScope();
 
         var seeder = scope.ServiceProvider
             .GetRequiredService<DatabaseSeeder>();
 
-        await seeder.SeedAsync();
+        await seeder.SeedAsync(token);
     }
 }

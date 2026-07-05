@@ -35,22 +35,22 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(CancellationToken token)
     {
-        var products = await _getProductsHandler.HandleAsync();
+        var products = await _getProductsHandler.HandleAsync(token);
         return Ok(products);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken token)
     {
-        var product = await _getProductHandler.HandleAsync(id);
+        var product = await _getProductHandler.HandleAsync(id, token);
         return Ok(product);
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<IActionResult> Create(CreateProductRequest request, IValidator<CreateProductRequest> validator)
+    public async Task<IActionResult> Create(CreateProductRequest request, IValidator<CreateProductRequest> validator, CancellationToken token)
     {
         var validationResult = await validator.ValidateAsync(request);
 
@@ -59,14 +59,14 @@ public class ProductsController : ControllerBase
         
         var command = new AddProductCommand(request.Name, request.Description, request.Price);
         
-        var result = await _addProductHandler.HandleAsync(command);
+        var result = await _addProductHandler.HandleAsync(command, token);
 
         return CreatedAtAction(nameof(GetById), new { id = result.ProductId }, result);
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPatch("{id}")]
-    public async Task<IActionResult> Update(Guid id, UpdateProductRequest request, IValidator<UpdateProductRequest> validator)
+    public async Task<IActionResult> Update(Guid id, UpdateProductRequest request, IValidator<UpdateProductRequest> validator, CancellationToken token)
     {
         var validationResult = await validator.ValidateAsync(request);
 
@@ -75,16 +75,16 @@ public class ProductsController : ControllerBase
         
         var command = new UpdateProductCommand(id, request.Name, request.Description, request.Price);
 
-        await _updateProductHandler.HandleAsync(command);
+        await _updateProductHandler.HandleAsync(command, token);
 
         return NoContent();
     }
 
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken token)
     {
-        await _deleteProductHandler.HandleAsync(id);
+        await _deleteProductHandler.HandleAsync(id, token);
 
         return NoContent();
     }

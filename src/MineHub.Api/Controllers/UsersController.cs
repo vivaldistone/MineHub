@@ -18,16 +18,16 @@ namespace MineHub.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken token)
         {
-            var user = await _getUserHandler.HandleAsync(id);
+            var user = await _getUserHandler.HandleAsync(id, token);
             return Ok(user);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken token)
         {
-            var users = await _getUsersHandler.HandleAsync();
+            var users = await _getUsersHandler.HandleAsync(token);
             return Ok(users);
         }
 

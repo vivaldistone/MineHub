@@ -1,9 +1,9 @@
 using MineHub.Api.Extensions;
-using MineHub.Infrastructure.DependencyInjection;
-using MineHub.Application.DependencyInjection;
 using MineHub.Api.Middlewares;
 using FluentValidation;
 using MineHub.Api.Contracts.Validators.Products;
+using MineHub.Application;
+using MineHub.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,8 +27,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-await app.SeedDatabaseAsync();
+await app.SeedDatabaseAsync(app.Lifetime.ApplicationStopping);
 
 app.MapControllers();
+
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.Run();

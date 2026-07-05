@@ -21,15 +21,15 @@ public class CartsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCart()
+    public async Task<IActionResult> GetCart(CancellationToken token)
     {
-        var cart = await _getCartHandler.HandleAsync();
+        var cart = await _getCartHandler.HandleAsync(token);
 
         return Ok(cart);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddItemToCart(AddItemToCartRequest request, IValidator<AddItemToCartRequest> validator)
+    public async Task<IActionResult> AddItemToCart(AddItemToCartRequest request, IValidator<AddItemToCartRequest> validator, CancellationToken token)
     {
         var resultValidate = await validator.ValidateAsync(request);
 
@@ -37,7 +37,7 @@ public class CartsController : ControllerBase
             throw new ValidationException(resultValidate.Errors);
         
         var command = new AddItemToCartCommand(request.Id, request.Quantity);
-        await _addItemToCartHandler.HandleAsync(command);
+        await _addItemToCartHandler.HandleAsync(command, token);
 
         return Created();
     }
