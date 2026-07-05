@@ -4,7 +4,7 @@ namespace MineHub.Application.Abstractions.Persistence;
 
 public interface ICartRepository
 {
-    Task<Cart?> GetByIdAsync(Guid id, CancellationToken token);
+    Task SaveAsync(Cart cart, CancellationToken token);
     Task<Cart?> GetByUserIdAsync(Guid userId, CancellationToken token);
-    Task AddAsync(Cart cart, CancellationToken token);
+    Task RemoveAsync(Guid userId, CancellationToken token);
 }
