@@ -5,20 +5,23 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MineHub.Application.Abstractions.Auth;
-using MineHub.Application.Abstractions.Cache;
-using MineHub.Application.Abstractions.Carts;
+using MineHub.Application.Abstractions.Email;
+using MineHub.Application.Abstractions.Payments;
 using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Abstractions.Users;
-using MineHub.Infrastructure.Authentication;
-using MineHub.Infrastructure.Identity;
-using MineHub.Infrastructure.Identity.Services;
+using MineHub.Infrastructure.Auth.Entities;
+using MineHub.Infrastructure.Auth.Hashing;
+using MineHub.Infrastructure.Auth.Jwt;
+using MineHub.Infrastructure.Auth.Services;
+using MineHub.Infrastructure.Email;
+using MineHub.Infrastructure.Payments.Options;
+using MineHub.Infrastructure.Payments.Services.YooKassaPayment;
 using MineHub.Infrastructure.Persistence;
 using MineHub.Infrastructure.Persistence.Repositories;
 using MineHub.Infrastructure.Persistence.Seeders;
-using MineHub.Infrastructure.Redis;
 using System.Text;
 
-namespace MineHub.Infrastructure.DependencyInjection;
+namespace MineHub.Infrastructure;
 
 public static class DependencyInjection 
 {
@@ -30,9 +33,9 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<ICurrentDomainUserService, DomainUserService>();
-        services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<ICurrentIdentityContext, CurrentIdentityContext>();
+        services.AddScoped<IDomainUserResolver, DomainUserResolver>();
+        services.AddScoped<IAccountService, AccountService>();
         
         services.AddScoped<DatabaseSeeder>();
         services.AddScoped<ProductSeeder>();
@@ -51,7 +54,9 @@ public static class DependencyInjection
         {
             options.Password.RequireNonAlphanumeric = false;
 
-        }).AddRoles<IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+        }).AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -85,9 +90,15 @@ public static class DependencyInjection
             options.InstanceName = "MineHub:";
         });
 
-        services.AddSingleton<ICacheService, RedisCacheService>();
-        services.AddSingleton<ICartCacheService, CartCacheService>();
-        services.AddScoped<ICartService, CartService>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IPaymentProvider, YooKassaPaymentProvider>();
+
+        services.Configure<YooKassaOptions>(configuration.GetSection("YooKassa"));
+        services.AddHttpClient<YooKassaPaymentProvider>();
+
+        services.AddScoped<IEmailSender, EmailSender>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }
