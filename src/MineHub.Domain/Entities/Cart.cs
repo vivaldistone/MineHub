@@ -25,13 +25,14 @@ public class Cart : AggregateRoot
     }
 
     public static Cart Rehydrate(
-        Guid userId, 
+        Guid id,
+        Guid userId,
         List<CartItem> items, 
         DateTime createdAt, 
         DateTime updatedAt)
     {
         var cart = new Cart(userId);
-
+        cart.Id = id;
         cart._cartItems = items;
         cart.CreatedAtUtc = createdAt;
         cart.UpdatedAtUtc = updatedAt;

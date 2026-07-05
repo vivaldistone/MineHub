@@ -58,6 +58,7 @@ public class CartRepository : ICartRepository
             return null;
 
         var cart = Cart.Rehydrate(
+        cartCacheDto.Id,
         cartCacheDto.UserId,
         cartCacheDto.СartItems.Select(x => new CartItem(x.ProductId, x.Quantity)).ToList(),
         cartCacheDto.CreatedAtUtc,
