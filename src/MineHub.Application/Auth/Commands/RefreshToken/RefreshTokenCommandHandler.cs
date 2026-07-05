@@ -8,25 +8,25 @@ public class RefreshTokenCommandHandler
 {
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    private readonly IIdentityService _identityService;
+    private readonly IAccountService _identityService;
 
-    public RefreshTokenCommandHandler(IRefreshTokenRepository refreshTokenRepository, IJwtTokenGenerator jwtTokenGenerator, IIdentityService identityService)
+    public RefreshTokenCommandHandler(IRefreshTokenRepository refreshTokenRepository, IJwtTokenGenerator jwtTokenGenerator, IAccountService identityService)
     {
         _refreshTokenRepository = refreshTokenRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
         _identityService = identityService;
     }
 
-    public async Task<string> HandleAsync(RefreshTokenCommand command)
+    public async Task<string> HandleAsync(RefreshTokenCommand command, CancellationToken token)
     {
-        var refreshToken = await _refreshTokenRepository.GetRefreshTokenAsync(command.hash);
+        var refreshToken = await _refreshTokenRepository.GetRefreshTokenAsync(command.hash, token);
         
         if (refreshToken is null)
             throw new UnauthorizedException("user not authorize", "user_not_authorize");
 
         var authUserId = refreshToken.UserId;
 
-        var userInfoToken = await _identityService.GetTokenUserInfoAsync(authUserId);
+        var userInfoToken = await _identityService.GetTokenUserInfoAsync(authUserId, token);
 
         var jwt = _jwtTokenGenerator.GenerateToken(
             userInfoToken.authUserId, 
