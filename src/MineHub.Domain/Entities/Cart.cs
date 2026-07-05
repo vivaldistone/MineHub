@@ -1,17 +1,17 @@
-﻿using MineHub.Domain.ValueObjects;
-using MineHub.Domain.Exceptions;
+﻿using MineHub.Domain.Exceptions;
 using MineHub.Domain.Shared;
+using MineHub.Domain.ValueObjects;
+using System.Text.Json.Serialization;
 
 namespace MineHub.Domain.Entities;
 
 public class Cart : AggregateRoot
 {
-    private List<CartItem> _cartItems = new (); 
+    private List<CartItem> _cartItems = new();
     public Guid UserId { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public DateTime UpdatedAtUtc { get; private set; }
     public IReadOnlyCollection<CartItem> CartItems => _cartItems.AsReadOnly();
-    public decimal TotalPrice => _cartItems.Sum(c => c.TotalPrice);
 
     public Cart(Guid userId)
     {
@@ -24,26 +24,36 @@ public class Cart : AggregateRoot
         UpdatedAtUtc = CreatedAtUtc;
     }
 
-    public void AddItem(Product product, int quantity)
+    public static Cart Rehydrate(
+        Guid userId, 
+        List<CartItem> items, 
+        DateTime createdAt, 
+        DateTime updatedAt)
     {
-        if (product is null)
-            throw new DomainException("Product is required", "invalid_product");
+        var cart = new Cart(userId);
+
+        cart._cartItems = items;
+        cart.CreatedAtUtc = createdAt;
+        cart.UpdatedAtUtc = updatedAt;
+
+        return cart;
+    }
+
+    public void AddItem(Guid productId, int quantity)
+    {
+        if (productId == Guid.Empty)
+            throw new DomainException("Product id is required", "product_id_is_required");
         if (quantity <= 0)
             throw new DomainException("Quantity must be greater than zero", "invalid_quantity");
-        if (!product.IsActive)
-            throw new DomainException("Product is not active", "product_not_active");
 
-        var index = _cartItems.FindIndex(p => p.ProductId == product.Id);
+        var index = _cartItems.FindIndex(p => p.ProductId == productId);
         
         if (index != -1)
         {
             var existingItem = _cartItems[index];
             
             var updatedItem = new CartItem(
-                product.Id, 
-                product.Name,
-                product.Description,
-                product.Price, 
+                productId, 
                 existingItem.Quantity + quantity);
 
             _cartItems[index] = updatedItem;
@@ -51,7 +61,7 @@ public class Cart : AggregateRoot
             return;
         }
 
-        _cartItems.Add(new CartItem(product.Id, product.Name, product.Description, product.Price, quantity));
+        _cartItems.Add(new CartItem(productId, quantity));
         UpdatedAtUtc = DateTime.UtcNow;
     }
 
@@ -102,32 +112,4 @@ public class Cart : AggregateRoot
 
         UpdatedAtUtc = DateTime.UtcNow;
     }
-
-    public void RefreshItemsFromProducts(IEnumerable<Product> productsInCart)
-    {
-        var wasUpdatedCart = false;
-        
-        foreach (var product in productsInCart)
-        {
-            var index = _cartItems.FindIndex(c => c.ProductId == product.Id);
-            
-            if (index == -1)
-                continue;
-            
-            var cartItem = _cartItems[index];
-            
-            if (cartItem.ProductName != product.Name || cartItem.UnitPrice != product.Price || cartItem.Description != product.Description)
-            {
-                var updatedCartItem = new CartItem(cartItem.ProductId, product.Name, product.Description, product.Price, cartItem.Quantity);
-
-                _cartItems[index] = updatedCartItem;
-
-                wasUpdatedCart = true;
-            }
-        }
-
-        if (wasUpdatedCart)
-            UpdatedAtUtc =DateTime.UtcNow;
-    }
-
 }
