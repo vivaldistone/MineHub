@@ -2,4 +2,4 @@
 
 namespace MineHub.Application.Orders.Queries.GetOrders;
 
-public record GetOrderResponse(Guid OrderId, DateTime CreatedAtUtc, OrderStatus Status, decimal TotalPrice, IReadOnlyCollection<GetOrderItemResponse> orderItems);
+public sealed record GetOrderResponse(Guid OrderId, DateTime CreatedAtUtc, OrderStatus Status, decimal TotalPrice, IReadOnlyCollection<GetOrderItemResponse> orderItems);

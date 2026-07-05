@@ -1,43 +1,37 @@
 ﻿using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Users;
 using MineHub.Application.Exceptions;
+using MineHub.Application.Orders.Queries.GetOrders;
 
 namespace MineHub.Application.Orders.Queries.GetOrder;
 
 public class GetOrderQueryHandler
 {
     private readonly IOrderRepository _orderRepository;
-    private readonly ICurrentDomainUserService _currentDomainUserService;
 
-    public GetOrderQueryHandler(IOrderRepository orderRepository, ICurrentDomainUserService currentDomainUserService)
+    public GetOrderQueryHandler(IOrderRepository orderRepository)
     {
         _orderRepository = orderRepository;
-        _currentDomainUserService = currentDomainUserService;
     }
 
-    public async Task<GetOrderResponse> HandleAsync(Guid id)
+    public async Task<GetUserOrderResponse> HandleAsync(Guid id, CancellationToken token)
     {
-        var user = await _currentDomainUserService.GetRequiredAsync();
-
-        var order = await _orderRepository.GetByUserIdAndOrderIdAsync(user.Id, id);
+        var order = await _orderRepository.GetByIdAsync(id, token);
 
         if (order is null)
             throw new NotFoundException("Order not found", "order_not_found");
 
-        return new GetOrderResponse(
-            order.Id, 
-            order.CreatedAtUtc, 
-            order.Status, 
-            order.TotalPrice, 
-            
-            order.OrderItems.Select(o =>
-            new GetOrderItemResponse(
-                o.ProductId, 
-                o.Name, 
-                o.Description, 
-                o.UnitPrice, 
-                o.Quantity, 
-                o.TotalPrice))
-                .ToList());
+        return new GetUserOrderResponse(
+            order.Id,
+            order.CreatedAtUtc,
+            order.Status,
+            order.TotalPrice,
+            order.OrderItems.Select(oi =>
+            new GetUserOrderItemByIdResponse(
+                oi.ProductId,
+                oi.Name,
+                oi.Description,
+                oi.UnitPrice,
+                oi.Quantity,
+                oi.TotalPrice)).ToList());
     }
 }

@@ -6,25 +6,31 @@ namespace MineHub.Application.Orders.Commands.CancelOrder;
 
 public class CancelOrderCommandHandler
 {
-    private readonly ICurrentDomainUserService _currentDomainUserService;
+    private readonly IDomainUserResolver _currentDomainUserService;
     private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CancelOrderCommandHandler(ICurrentDomainUserService currentDomainUserService, IOrderRepository orderRepository)
+    public CancelOrderCommandHandler(
+        IDomainUserResolver currentDomainUserService, 
+        IOrderRepository orderRepository,
+        IUnitOfWork unitOfWork)
     {
         _currentDomainUserService = currentDomainUserService;
         _orderRepository = orderRepository;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task HandleAsync()
+    public async Task HandleAsync(CancellationToken token)
     {
-        var user = await _currentDomainUserService.GetRequiredAsync();
+        var user = await _currentDomainUserService.GetRequiredAsync(token);
 
-        var createdOrder = await _orderRepository.GetCreatedByUserIdAsync(user.Id);
+        var order = await _orderRepository.GetCreatedByUserIdAsync(user.Id, token);
 
-        if (createdOrder is null)
+        if (order is null)
             throw new NotFoundException("Created order not found", "created_order_not_found");
 
-        createdOrder.Cancel();
-        await _orderRepository.UpdateAsync(createdOrder);
+        order.Cancel();
+
+        await _unitOfWork.SaveChangesAsync(token);
     }
 }
