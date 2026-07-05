@@ -10,13 +10,13 @@ public class GetProductsQueryHandler
     {
         _productRepository = productRepository;
     }
-    public async Task<IReadOnlyCollection<GetProductResponse>> HandleAsync()
+    public async Task<IReadOnlyCollection<GetProductResponse>> HandleAsync(CancellationToken token)
     {
-        var products = await _productRepository.GetAllAsync();
+        var products = await _productRepository.GetAllAsync(token);
 
         return products.Select(p =>
         new GetProductResponse(
-            p.ProductId,
+            p.Id,
             p.Name,
             p.Description,
             p.Price))
