@@ -1,37 +1,35 @@
-﻿using MineHub.Application.Exceptions;
-using MineHub.Application.Abstractions.Cache;
-using MineHub.Application.Abstractions.Users;
-using MineHub.Application.Abstractions.Carts;
+﻿using MineHub.Application.Abstractions.Users;
+using MineHub.Application.Abstractions.Persistence;
 
 namespace MineHub.Application.Carts.Commands.ChangeCartItemQuantity;
 
 public class ChangeCartItemQuantityCommandHandler
 {
-    private readonly ICurrentDomainUserService _currentDomainUserService;
-    private readonly ICartCacheService _cartCacheService;
-    private readonly ICartService _cartService;
+    private readonly IDomainUserResolver _domainUserResolver;
+    private readonly ICartRepository _cartRepository;
 
     public ChangeCartItemQuantityCommandHandler(
-        ICurrentDomainUserService currentDomainUserService,
-        ICartCacheService cartCacheService,
-        ICartService cartService)
+        IDomainUserResolver domainUserResolver,
+        ICartRepository cartRepository)
     {
-        _currentDomainUserService = currentDomainUserService;
-        _cartCacheService = cartCacheService;
-        _cartService = cartService;
+        _domainUserResolver = domainUserResolver;
+        _cartRepository = cartRepository;
     }
 
-    public async Task HandleAsync(ChangeCartItemQuantityCommand command)
+    public async Task HandleAsync(ChangeCartItemQuantityCommand command, CancellationToken token)
     {
-        var user = await _currentDomainUserService.GetRequiredAsync();
+        var domainUser = await _domainUserResolver.GetRequiredAsync(token);
 
-        var cachedCart = await _cartCacheService.GetCartAsync(user.Id);
+        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id, token);
 
-        if (cachedCart is null)
-            throw new NotFoundException("Cart not found in cache", "cart_not_found_in_cache");
+        if (cart is null)
+            return;
 
-        _cartService.ChangeQuantity(cachedCart,command.ProductId,command.Quantity);
+        cart.ChangeQuantity(command.ProductId, command.Quantity);
 
-        await _cartCacheService.SetCartAsync(user.Id,cachedCart, TimeSpan.FromDays(7));
+        if (!cart.CartItems.Any())
+            await _cartRepository.RemoveAsync(domainUser.Id, token);
+        else
+            await _cartRepository.SaveAsync(cart, token);
     }
 }

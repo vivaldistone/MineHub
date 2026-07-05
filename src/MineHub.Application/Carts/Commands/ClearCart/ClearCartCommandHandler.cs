@@ -1,27 +1,24 @@
-﻿using MineHub.Application.Abstractions.Cache;
-using MineHub.Application.Abstractions.Carts;
+﻿using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Abstractions.Users;
 
 namespace MineHub.Application.Carts.Commands.ClearCart;
 
 public class ClearCartCommandHandler
 {
-    private readonly ICartCacheService _cartCacheService;
-    private readonly ICurrentDomainUserService _currentDomainUserService;
-
+    private readonly ICartRepository _cartRepository;
+    private readonly IDomainUserResolver _domainUserResolver;
     public ClearCartCommandHandler(
-        ICartCacheService cartCacheService, 
-        ICurrentDomainUserService currentDomainUserService,
-        ICartService cartService)
+        ICartRepository cartRepository, 
+        IDomainUserResolver domainUserResolver)
     {
-        _cartCacheService = cartCacheService;
-        _currentDomainUserService = currentDomainUserService;
+        _cartRepository = cartRepository;
+        _domainUserResolver = domainUserResolver;
     }
 
-    public async Task HandleAsync()
+    public async Task HandleAsync(CancellationToken token)
     {
-        var domainUser = await _currentDomainUserService.GetRequiredAsync();
+        var domainUser = await _domainUserResolver.GetRequiredAsync(token);
 
-        await _cartCacheService.RemoveAsync(domainUser.Id);
+        await _cartRepository.RemoveAsync(domainUser.Id, token);
     }
 }

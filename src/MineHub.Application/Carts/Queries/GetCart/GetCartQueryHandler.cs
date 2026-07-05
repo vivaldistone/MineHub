@@ -1,67 +1,70 @@
-﻿using MineHub.Application.Abstractions.Cache;
-using MineHub.Application.Abstractions.Users;
-using MineHub.Application.Abstractions.Cache.DTOs;
+﻿using MineHub.Application.Abstractions.Users;
 using MineHub.Application.Abstractions.Persistence;
-using MineHub.Application.Abstractions.Carts;
 
 namespace MineHub.Application.Carts.Queries.GetCart;
 
 public class GetCartQueryHandler
 {
-    private readonly ICurrentDomainUserService _currentDomainUserService;
-    private readonly ICartCacheService _cartCacheService;
+    private readonly IDomainUserResolver _currentDomainUserService;
+    private readonly ICartRepository _cartRepository;
     private readonly IProductRepository _productRepository;
-    private readonly ICartService _cartService;
 
     public GetCartQueryHandler(
-        ICurrentDomainUserService currentDomainUserService, 
-        ICartCacheService cartCacheService,
+        IDomainUserResolver currentDomainUserService, 
         IProductRepository productRepository,
-        ICartService cartService)
+        ICartRepository cartRepository)
     {
         _currentDomainUserService = currentDomainUserService;
-        _cartCacheService = cartCacheService;
         _productRepository = productRepository;
-        _cartService = cartService;
+        _cartRepository = cartRepository;
     }
 
-    public async Task<GetCartResponse> HandleAsync()
+    public async Task<GetCartResponse> HandleAsync(CancellationToken token)
     {     
-        var domainUser = await _currentDomainUserService.GetRequiredAsync();
+        var domainUser = await _currentDomainUserService.GetRequiredAsync(token);
 
-        var cartCached = await _cartCacheService.GetCartAsync(domainUser.Id);
+        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id, token);
 
-        if (cartCached is null)
-        {
-            cartCached = new CartCacheDto(domainUser.Id);
+        if (cart is null)
+            return new GetCartResponse(
+                Guid.Empty, 
+                null, 
+                null, 
+                0, 
+                []);
 
-            await _cartCacheService.SetCartAsync(domainUser.Id, cartCached, TimeSpan.FromDays(7));
-        }
+        var productsIds = cart.CartItems.Select(c => c.ProductId).ToList();
 
-        var productsIds = cartCached.CartItems.Select(c => c.ProductId).ToList();
+        var products = await _productRepository.GetByIdsAsync(productsIds, token);
 
-        var products = await _productRepository.GetByIdsAsync(productsIds);
-
-        var wasUpdatedCart = _cartService.RefreshItemsFromProducts(cartCached, products);
-        
-        if (wasUpdatedCart)
-        {
-            await _cartCacheService.SetCartAsync(domainUser.Id, cartCached, TimeSpan.FromDays(7));
-        }
+        var productsWithQuantity = products.Join(
+            cart.CartItems,
+            p => p.Id,
+            c => c.ProductId,
+            (p, c) => new
+            {
+                p.Id,
+                p.Name,
+                p.Description,
+                p.Price,
+                c.Quantity,
+                TotalPrice = p.Price * c.Quantity
+            }).ToList();
 
         return new GetCartResponse(
-            cartCached.Id,
-            cartCached.CreatedAtUtc,
-            cartCached.UpdatedAtUtc,
-            cartCached.CartItems.Sum(c => c.TotalPrice),
+            cart.Id,
+            cart.CreatedAtUtc,
+            cart.UpdatedAtUtc,
+            productsWithQuantity.Sum(p => p.TotalPrice),
 
-            cartCached.CartItems.Select(c => new GetCartItemResponse(
-            c.ProductId,
-            c.ProductName,
-            c.Description,
-            c.UnitPrice,
-            c.Quantity,
-            c.TotalPrice)).ToList()
+            productsWithQuantity.Select(p =>
+            new GetCartItemResponse(
+                p.Id,
+                p.Name,
+                p.Description,
+                p.Price,
+                p.Quantity,
+                p.TotalPrice)).ToList()
             );
     }
 }

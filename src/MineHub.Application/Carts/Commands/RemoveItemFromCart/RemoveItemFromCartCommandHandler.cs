@@ -1,42 +1,35 @@
-﻿using MineHub.Application.Abstractions.Cache;
-using MineHub.Application.Abstractions.Carts;
+﻿using MineHub.Application.Abstractions.Persistence;
 using MineHub.Application.Abstractions.Users;
 
 namespace MineHub.Application.Carts.Commands.RemoveItemFromCart;
 
 public class RemoveItemFromCartCommandHandler
 {
-    private readonly ICurrentDomainUserService _currentDomainUserService;
-    private readonly ICartCacheService _cartCacheService;
-    private readonly ICartService _cartService;
+    private readonly IDomainUserResolver _domainUserResolver;
+    private readonly ICartRepository _cartRepository;
 
     public RemoveItemFromCartCommandHandler(
-        ICurrentDomainUserService currentDomainUserService,
-        ICartCacheService cartCacheService,
-        ICartService cartService)
+        IDomainUserResolver domainUserResolver,
+        ICartRepository cartRepository)
     {
-        _currentDomainUserService = currentDomainUserService;
-        _cartCacheService = cartCacheService;
-        _cartService = cartService;
+        _domainUserResolver = domainUserResolver;
+        _cartRepository = cartRepository;
     }
 
-    public async Task HandleAsync(Guid productId)
+    public async Task HandleAsync(Guid productId, CancellationToken token)
     {
-        var domainUser = await _currentDomainUserService.GetRequiredAsync();
+        var domainUser = await _domainUserResolver.GetRequiredAsync(token);
 
-        var cachedCart = await _cartCacheService.GetCartAsync(domainUser.Id);
+        var cart = await _cartRepository.GetByUserIdAsync(domainUser.Id, token);
 
-        if (cachedCart is null)
+        if (cart is null)
             return;
 
-        _cartService.RemoveItem(cachedCart, productId);
+        cart.RemoveItem(productId);
 
-        if (cachedCart.CartItems.Count == 0)
-        {
-            await _cartCacheService.RemoveAsync(domainUser.Id);
-            return;
-        }
-
-        await _cartCacheService.SetCartAsync(domainUser.Id, cachedCart, TimeSpan.FromDays(7));
+        if (!cart.CartItems.Any())
+            await _cartRepository.RemoveAsync(domainUser.Id, token);
+        else
+            await _cartRepository.SaveAsync(cart, token);
     }
 }
