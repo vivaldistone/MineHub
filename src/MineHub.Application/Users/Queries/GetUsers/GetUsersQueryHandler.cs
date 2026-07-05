@@ -11,13 +11,13 @@ public class GetUsersQueryHandler
         _userRepository = userRepository;
     }
 
-    public async Task<IReadOnlyCollection<GetUserResponse>> HandleAsync()
+    public async Task<IReadOnlyCollection<GetUserResponse>> HandleAsync(CancellationToken token)
     {
-        var users = await _userRepository.GetAllAsync();
+        var users = await _userRepository.GetAllAsync(token);
 
         return users.Select(u => new GetUserResponse(
             u.Id,
-            u.Email,
+            u.Email.ToString(),
             u.CreatedAtUtc,
             u.MinecraftProfile?.MinecraftUuid,
             u.MinecraftProfile?.NickName))
