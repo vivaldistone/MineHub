@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MineHub.Application.Abstractions.Persistence;
-using MineHub.Infrastructure.Identity;
 using MineHub.Domain.Entities;
+using MineHub.Domain.ValueObjects;
+using MineHub.Infrastructure.Auth.Entities;
 
 namespace MineHub.Infrastructure.Persistence.Seeders;
 
@@ -22,7 +23,7 @@ public class IdentitySeeder
         _userRepository = userRepository;
     }
 
-    public async Task SeedAsync()
+    public async Task SeedAsync(CancellationToken token)
     {
         var email = _configuration["Admin:Email"];
         var password = _configuration["Admin:Password"];
@@ -69,12 +70,12 @@ public class IdentitySeeder
             }
         }
 
-        var domainUser = await _userRepository.GetByIdentityUserEmailAsync(authUser.Email);
+        var domainUser = await _userRepository.GetByIdentityUserEmailAsync(new EmailAdress(authUser.Email), token);
 
         if (domainUser is null)
         {
-            domainUser = new User(authUser.Id, email);
-            await _userRepository.AddAsync(domainUser);
+            domainUser = new User(authUser.Id, new EmailAdress(email));
+            await _userRepository.AddAsync(domainUser, token);
         }    
 
     }

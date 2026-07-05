@@ -13,10 +13,10 @@ public class DatabaseSeeder
         _productSeeder = productSeeder;
     }
 
-    public async Task SeedAsync()
+    public async Task SeedAsync(CancellationToken token)
     {
         await _roleSeeder.SeedAsync();
-        await _identitySeeder.SeedAsync();
+        await _identitySeeder.SeedAsync(token);
         await _productSeeder.SeedAsync();
     }
 }
