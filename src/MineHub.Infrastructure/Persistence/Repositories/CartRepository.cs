@@ -1,30 +1,74 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using MineHub.Application.Abstractions.Persistence;
 using MineHub.Domain.Entities;
+using MineHub.Domain.ValueObjects;
+using System.Text.Json;
+using MineHub.Infrastructure.Persistence.Repositories.DTOs;
 
 namespace MineHub.Infrastructure.Persistence.Repositories;
 
 public class CartRepository : ICartRepository
 {
-    private readonly AppDbContext _appDbContext;
+    private readonly IDistributedCache _distributedCache;
+    private static readonly TimeSpan _timeSpan = TimeSpan.FromDays(7);
 
-    public CartRepository(AppDbContext appDbContext)
+    public CartRepository(IDistributedCache distributedCache)
     {
-        _appDbContext = appDbContext;
+        _distributedCache = distributedCache;
     }
 
-    public async Task AddAsync(Cart cart, CancellationToken token)
-    {
-        await _appDbContext.Carts.AddAsync(cart, token);
-    }
+    private static string GetKey(Guid userId) => $"cart:{userId}";
 
-    public async Task<Cart?> GetByIdAsync(Guid id, CancellationToken token)
+
+    public async Task SaveAsync(Cart cart, CancellationToken token)
     {
-        return await _appDbContext.Carts.FirstOrDefaultAsync(c => c.Id == id, token);
+        var cartCacheDto = new CartCacheDto
+        {
+            UserId = cart.UserId,
+            CreatedAtUtc = cart.CreatedAtUtc,
+            UpdatedAtUtc = cart.UpdatedAtUtc,
+            СartItems = cart.CartItems.Select(ci =>
+            new CartItemCacheDto()
+            {
+                ProductId = ci.ProductId,
+                Quantity = ci.Quantity
+            }).ToList()
+        };
+        
+        var json = JsonSerializer.Serialize(cartCacheDto);
+
+        await _distributedCache.SetStringAsync(GetKey(cartCacheDto.UserId), json,
+            new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = _timeSpan
+            }, 
+            token);
     }
 
     public async Task<Cart?> GetByUserIdAsync(Guid userId, CancellationToken token)
     {
-        return await _appDbContext.Carts.FirstOrDefaultAsync(c => c.UserId == userId, token);
+        var json = await _distributedCache.GetStringAsync(GetKey(userId), token);
+
+        if (json is null)
+            return null;
+
+        var cartCacheDto = JsonSerializer.Deserialize<CartCacheDto>(json);
+
+        if (cartCacheDto is null)
+            return null;
+
+        var cart = Cart.Rehydrate(
+        cartCacheDto.UserId,
+        cartCacheDto.СartItems.Select(x => new CartItem(x.ProductId, x.Quantity)).ToList(),
+        cartCacheDto.CreatedAtUtc,
+        cartCacheDto.UpdatedAtUtc
+        );
+
+        return cart;
+    }
+
+    public async Task RemoveAsync(Guid userId, CancellationToken token)
+    {
+        await _distributedCache.RemoveAsync(GetKey(userId), token);
     }
 }

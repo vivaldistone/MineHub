@@ -25,7 +25,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken token)
     {
-        return await _appDbContext.Products.AnyAsync(p => p.ProductId == id, token);
+        return await _appDbContext.Products.AnyAsync(p => p.Id == id, token);
     }
 
     public async Task<IReadOnlyCollection<Product>> GetAllAsync(CancellationToken token)
@@ -35,7 +35,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetByIdAsync(Guid id , CancellationToken token)
     {
-        return await _appDbContext.Products.FirstOrDefaultAsync(p => p.ProductId == id, token);
+        return await _appDbContext.Products.FirstOrDefaultAsync(p => p.Id == id, token);
     }
 
     public async Task<Product?> GetByNameAsync(string name, CancellationToken token)
@@ -47,7 +47,7 @@ public class ProductRepository : IProductRepository
     {
         return await _appDbContext
             .Products
-            .Where(p => productIds.Contains(p.ProductId))
+            .Where(p => productIds.Contains(p.Id))
             .ToListAsync(token);
     }
 }

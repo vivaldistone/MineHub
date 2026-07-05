@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MineHub.Application.Abstractions.Persistence;
 using MineHub.Domain.Entities;
+using MineHub.Domain.ValueObjects;
 
 namespace MineHub.Infrastructure.Persistence.Repositories;
 
@@ -33,7 +34,7 @@ public class UserRepository : IUserRepository
         return await _appDbContext.DomainUsers.ToListAsync(token);
     }
 
-    public async Task<User?> GetByEmailAsync(string email, CancellationToken token)
+    public async Task<User?> GetByEmailAsync(EmailAdress email, CancellationToken token)
     {
         return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email ==  email, token);
     }
@@ -43,7 +44,7 @@ public class UserRepository : IUserRepository
         return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Id == guid, token);
     }
 
-    public async Task<User?> GetByIdentityUserEmailAsync(string email, CancellationToken token)
+    public async Task<User?> GetByIdentityUserEmailAsync(EmailAdress email, CancellationToken token)
     {
         return await _appDbContext.DomainUsers.FirstOrDefaultAsync(u => u.Email == email, token);
     }
